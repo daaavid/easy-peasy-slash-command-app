@@ -1,7 +1,6 @@
 "use strict";
 
 const mysql = require("mysql");
-const log = require("./logging-util");
 
 // START MYSQL VERSION
 let connection;
@@ -9,7 +8,7 @@ let connection;
 // If no connection is present OR if the connection encounters
 // a connection lost error throw an error to halt the script and let forever
 // restart it.
-mysqlConnect = () => {
+function mysqlConnect() {
   const c = mysql.createConnection({
     debug: process.env.APP_DEBUG_SQL
       ? ["ComQueryPacket", "RowDataPacket"]
@@ -24,12 +23,12 @@ mysqlConnect = () => {
 
   c.connect(err => {
     if (err) {
-      log.error("mysql connection error", err.stack);
+      console.error("mysql connection error", err.stack);
       throw new Error("no db connection");
       return false;
     }
 
-    log.info("mysql connected as thread id %d", c.threadId);
+    console.info("mysql connected as thread id %d", c.threadId);
   });
 
   c.on("error", err => {
@@ -41,7 +40,7 @@ mysqlConnect = () => {
   });
 
   connection = c;
-};
+}
 
 mysqlConnect();
 
