@@ -1,5 +1,5 @@
 const moment = require("moment");
-const query = require("../utils/db-query");
+const dbQuery = require("../utils/db-query");
 const uuid = require("../utils/uuid");
 
 module.exports = class Sheet {
@@ -41,7 +41,7 @@ module.exports = class Sheet {
     return { attachments };
   }
 
-  static insert = sheet => {
+  static insert(sheet) {
     const insertQueryString = `
       INSERT INTO \`sheets\` (
         \`id\` = ?,
@@ -53,15 +53,15 @@ module.exports = class Sheet {
       VALUES (?, ?, ?, ?, NOW());
     `;
 
-    return query(insertQueryString, [
+    return dbQuery(insertQueryString, [
       uuid(),
       sheet.name,
       sheet.date,
       sheet.members
     ]);
-  };
+  }
 
-  static update = sheet => {
+  static update(sheet) {
     const updateQueryString = `
       UPDATE \`sheets\` SET
         \`name\` = ?,
@@ -71,27 +71,29 @@ module.exports = class Sheet {
         \`id\` = ?
     `;
 
-    return query(updateQueryString, [
+    return dbQuery(updateQueryString, [
       sheet.name,
       sheet.date,
       sheet.members,
       sheet.id
     ]);
-  };
+  }
 
-  static select = id => {
-    const selectQueryString = `
-      SELECT *
-      FROM \`sheets\` as \`s\`
-      WHERE \`s\`.\`id\` = ?
-    `;
+  static select(params) {
+    const { keys, values } = Object;
+    const selectQueryString = `SELECT * FROM sheets WHERE `;
+    const wheres = keys(params)
+      .map(key => `${key} = ?`)
+      .join(" AND ");
 
-    return query(selectQueryString, [id]);
-  };
+    console.log("select");
 
-  static upsert = sheet => {
-    return this.select(sheet.id)
+    return dbQuery(selectQueryString + wheres, values(params));
+  }
+
+  static upsert(sheet) {
+    return this.select({ id: sheet.id })
       .then(() => this.update(sheet))
       .catch(() => this.insert(sheet));
-  };
+  }
 };
