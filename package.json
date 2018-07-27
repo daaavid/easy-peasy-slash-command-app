@@ -27,6 +27,7 @@
   "dependencies": {
     "bitly": "^6.0.8",
     "botkit": "0.0.5",
+    "botkit-storage-firebase": "^1.0.1",
     "botkit-storage-mongo": "^1.0.2",
     "dotenv": "^6.0.0",
     "forecast": "^0.3.2",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.54",
+    "@babel/core": "7.0.0-beta.54",
     "@babel/preset-env": "^7.0.0-beta.54",
     "babel-plugin-lodash": "^3.3.4"
   }
