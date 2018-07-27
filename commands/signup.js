@@ -1,10 +1,11 @@
 const Sheet = require("../models/sheet");
-const first = require("lodash/first");
 
 const sheets = {};
 
-const signupFor = (command, message) => {
-  if (sheets[message.text]) {
+const signupFor = async (command, message) => {
+  let sheet = await Sheet.select({ name: message.text });
+
+  if (sheet) {
     sheets[message.text].members.push(message.user_name);
   } else {
     sheets[message.text] = new Sheet(message.text, [message.user_name]);
@@ -37,14 +38,8 @@ module.exports = (command, message) => {
   const [action, ...body] = message.text.split(" ");
 
   if (action === "for") {
-    signupFor(command, {
-      ...message,
-      text: body
-    });
+    signupFor(command, Object.assign(message, { text: body }));
   } else if (action === "status") {
-    signupStatus(command, {
-      ...message,
-      text: body
-    });
+    signupStatus(command, Object.assign(message, { text: body }));
   }
 };
