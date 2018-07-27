@@ -40,6 +40,7 @@
 
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+require("babel-register");
 require("dotenv").config();
 const Botkit = require("botkit");
 const slashCommands = require("./commands");
