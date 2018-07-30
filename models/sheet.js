@@ -9,10 +9,18 @@ module.exports = class Sheet {
   // location (actual location) (should be an array)
   // additional fields (username, alias, class, whatever)
 
-  constructor(name, members, date) {
-    this.name = name;
-    this.members = members;
-    this.date = date;
+  constructor(obj) {
+    this.id = obj.id;
+    this.name = obj.name;
+    this.date = obj.date;
+
+    if (!obj.members) {
+      this.members = [];
+    } else if (typeof obj.members === "string") {
+      this.members = JSON.parse(obj.members);
+    } else {
+      this.members = obj.members;
+    }
   }
 
   toMessage() {
@@ -29,7 +37,7 @@ module.exports = class Sheet {
     if (this.members.length) {
       attachments.push({
         title: `Members`,
-        text: `${this.members.map(member => `- @${member}\n`)}`
+        text: `${this.members.map(member => `- <@${member}>`).join("\n")}`
       });
     } else {
       attachments.push({
@@ -43,13 +51,7 @@ module.exports = class Sheet {
 
   static insert(sheet) {
     const insertQueryString = `
-      INSERT INTO \`sheets\` (
-        \`id\` = ?,
-        \`name\` = ?,
-        \`date\` = ?
-        \`members\` = ?
-        \`created_at\`
-      )
+      INSERT INTO sheets (id, name, date, members, created_at)
       VALUES (?, ?, ?, ?, NOW());
     `;
 
@@ -57,24 +59,20 @@ module.exports = class Sheet {
       uuid(),
       sheet.name,
       sheet.date,
-      sheet.members
+      JSON.stringify(sheet.members)
     ]);
   }
 
   static update(sheet) {
     const updateQueryString = `
-      UPDATE \`sheets\` SET
-        \`name\` = ?,
-        \`date\` = ?
-        \`members\` = ?
-      WHERE 
-        \`id\` = ?
+      UPDATE sheets SET name = ?, date = ?, members = ?
+      WHERE id = ?
     `;
 
     return dbQuery(updateQueryString, [
       sheet.name,
       sheet.date,
-      sheet.members,
+      JSON.stringify(sheet.members),
       sheet.id
     ]);
   }
@@ -86,9 +84,11 @@ module.exports = class Sheet {
       .map(key => `${key} = ?`)
       .join(" AND ");
 
-    console.log("select");
-
-    return dbQuery(selectQueryString + wheres, values(params));
+    return dbQuery(selectQueryString + wheres, values(params), true).then(
+      result => {
+        return new Sheet(result);
+      }
+    );
   }
 
   static upsert(sheet) {

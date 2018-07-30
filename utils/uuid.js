@@ -3,6 +3,6 @@ const s4 = () =>
     .toString(16)
     .substring(1);
 
-module.export = function() {
+module.exports = function() {
   return `${s4()}-${s4()}-${s4()}-${s4()}-${s4()}`;
 };
