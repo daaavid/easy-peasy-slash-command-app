@@ -21,6 +21,20 @@ function mysqlConnect() {
     ssl: process.env.DB_RDS === "true" ? "Amazon RDS" : null
   });
 
+  console.log('--------------->')
+
+  console.log(
+    'process.env.APP_DEBUG_SQL', process.env.APP_DEBUG_SQL,
+    'process.env.DB_HOST', process.env.DB_HOST,
+    'process.env.DB_USERNAME', process.env.DB_USERNAME,
+    'process.env.DB_PASSWORD', process.env.DB_PASSWORD,
+    'process.env.DB_DATABASE', process.env.DB_DATABASE,
+    'process.env.DB_PORT', process.env.DB_PORT,
+    'process.env.DB_RDS', process.env.DB_RDS,
+  )
+
+  console.log('--------------->')
+
   c.connect(err => {
     if (err) {
       console.error("mysql connection error", err.stack);
