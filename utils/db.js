@@ -43,14 +43,13 @@ function mysqlConnect() {
 
   console.log("--------------->");
 
-  p.connect(err => {
+  p.getConnection((err, connection) => {
     if (err) {
       console.error("mysql connection error", err.stack);
       throw new Error("no db connection");
-      return false;
     }
 
-    console.info("mysql connected as thread id %d", p.threadId);
+    console.info("mysql connected as thread id %d", connection.threadId);
   });
 
   p.on("error", err => {
