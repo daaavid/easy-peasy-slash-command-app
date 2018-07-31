@@ -3,13 +3,14 @@
 const mysql = require("mysql");
 
 // START MYSQL VERSION
-let connection;
+let pool;
 
 // If no connection is present OR if the connection encounters
 // a connection lost error throw an error to halt the script and let forever
 // restart it.
 function mysqlConnect() {
-  const c = mysql.createConnection({
+  const p = mysql.createPool({
+    connectionLimit: 5,
     debug: process.env.APP_DEBUG_SQL
       ? ["ComQueryPacket", "RowDataPacket"]
       : undefined,
@@ -21,31 +22,38 @@ function mysqlConnect() {
     ssl: process.env.DB_RDS === "true" ? "Amazon RDS" : null
   });
 
-  console.log('--------------->')
+  console.log("--------------->");
 
   console.log(
-    'process.env.APP_DEBUG_SQL', process.env.APP_DEBUG_SQL,
-    'process.env.DB_HOST', process.env.DB_HOST,
-    'process.env.DB_USERNAME', process.env.DB_USERNAME,
-    'process.env.DB_PASSWORD', process.env.DB_PASSWORD,
-    'process.env.DB_DATABASE', process.env.DB_DATABASE,
-    'process.env.DB_PORT', process.env.DB_PORT,
-    'process.env.DB_RDS', process.env.DB_RDS,
-  )
+    "process.env.APP_DEBUG_SQL",
+    process.env.APP_DEBUG_SQL,
+    "process.env.DB_HOST",
+    process.env.DB_HOST,
+    "process.env.DB_USERNAME",
+    process.env.DB_USERNAME,
+    "process.env.DB_PASSWORD",
+    process.env.DB_PASSWORD,
+    "process.env.DB_DATABASE",
+    process.env.DB_DATABASE,
+    "process.env.DB_PORT",
+    process.env.DB_PORT,
+    "process.env.DB_RDS",
+    process.env.DB_RDS
+  );
 
-  console.log('--------------->')
+  console.log("--------------->");
 
-  c.connect(err => {
+  p.connect(err => {
     if (err) {
       console.error("mysql connection error", err.stack);
       throw new Error("no db connection");
       return false;
     }
 
-    console.info("mysql connected as thread id %d", c.threadId);
+    console.info("mysql connected as thread id %d", p.threadId);
   });
 
-  c.on("error", err => {
+  p.on("error", err => {
     console.log(err.code); // 'ER_BAD_DB_ERROR'
     // if lost connection, try every 5 seconds to connect again
     if (err.code === "PROTOCOL_CONNECTION_LOST") {
@@ -53,13 +61,13 @@ function mysqlConnect() {
     }
   });
 
-  connection = c;
+  pool = p;
 }
 
 mysqlConnect();
 
 function db() {
-  return connection;
+  return pool;
 }
 
 module.exports = db;
