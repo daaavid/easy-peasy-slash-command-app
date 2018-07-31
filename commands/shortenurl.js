@@ -1,3 +1,4 @@
+/*
 var { BitlyClient } = require("bitly");
 var bitly = new BitlyClient("99ef55e577455d92ac5fa0ffecbed9bf274aa1d3", {});
 
@@ -35,3 +36,7 @@ module.exports = (slashCommand, message) => {
     }
   );
 };
+
+*/
+
+module.exports = () => {}
