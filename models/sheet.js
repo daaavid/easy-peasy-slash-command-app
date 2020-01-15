@@ -96,4 +96,6 @@ module.exports = class Sheet {
       .then(() => this.update(sheet))
       .catch(() => this.insert(sheet));
   }
+
+  static delete(params) {}
 };

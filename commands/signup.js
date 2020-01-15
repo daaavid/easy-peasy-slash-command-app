@@ -31,6 +31,20 @@ const signupStatus = async (command, message) => {
   }
 };
 
+const signupDelete = async (command, message) => {
+  try {
+    const sheet = await Sheet.select({ name: message.text });
+    Sheet.delete();
+
+    command.replyPublic(message, sheet.toMessage());
+  } catch (error) {
+    command.replyPublic(
+      message,
+      `I'm sorry, I couldn't find a matching sheet for ${message.text}.`
+    );
+  }
+};
+
 module.exports = (command, message) => {
   const respondWithError = () => {
     command.replyPublic(
@@ -49,6 +63,7 @@ module.exports = (command, message) => {
     signupFor(command, Object.assign(message, { text: body }));
   } else if (action === "status") {
     signupStatus(command, Object.assign(message, { text: body }));
+  } else if (action === "delete") {
   } else {
     respondWithError();
   }
